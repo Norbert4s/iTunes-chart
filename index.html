@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+
+<head>
+  <link rel="stylesheet" href="bootstrap/bootstrap.css">
+  <link rel="stylesheet" href="style.css">
+  <script src="https://cdn.jsdelivr.net/npm/vue@2.5.16/dist/vue.js"></script>
+  <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta charset="utf-8">
+  <title></title>
+</head>
+
+<body>
+  <div id="app">
+    <ul>
+      <li v-for="(album, index) in albums" class="album" v-on:click='add(album)'>
+        <div class="basic">
+          <span class="place">{{ index + 1}}</span>
+          <img class="albumImage" v-bind:src="album['im:image'][2].label" alt="">
+          <div class="fullName">
+            <span v-bind:class="{'showName': album.isActive}" class="title">{{ album['im:name'].label }}</span>
+            <span v-bind:class="{'showName': album.isActive}" class="artist">{{ album['im:artist'].label }}</span>
+          </div>
+          <div class="openArrow" v-bind:class="{'flipArrow': album.isActive}">
+            <img src="assets/angle-down-solid.svg" alt="">
+          </div>
+        </div>
+        <div class="detailed" v-bind:class="{'active': album.isActive}">
+              <div class="col-xs-4">
+                <span class="detailedSpan price"><span class="detailedSpanTitle">Price:</span>{{ album['im:price'].label }}</span>
+              </div>
+              <div class="col-xs-4">
+                <span class="detailedSpan link"><img src="assets/external-link-alt-solid.svg" alt=""></span>
+              </div>
+              <div class="col-xs-4">
+                <span class="detailedSpan date"><span class="detailedSpanTitle">Release date:</span>{{ album['im:releaseDate'].attributes.label }}</span>
+              </div>
+        </div>
+      </li>
+    </ul>
+  </div>
+</body>
+
+</html>
+
+<script type="text/javascript">
+  new Vue({
+    el: '#app',
+    data() {
+      return {
+        info: null,
+        albums: null,
+        loading: true,
+        errored: false,
+        hehe: false
+      }
+    },
+    methods: {
+      add: function(album) {
+        if (album.isActive === true) {
+          Vue.delete(album, 'isActive');
+          Vue.set(album, 'isActive', false);
+        } else {
+          Vue.delete(album, 'isActive');
+          Vue.set(album, 'isActive', true);
+        }
+      }
+    },
+    filters: {
+
+    },
+    mounted() {
+      axios
+        .get('https://itunes.apple.com/us/rss/topalbums/limit=100/json')
+        .then(response => {
+          this.info = response.data.feed
+          this.albums = this.info.entry
+          for (var value of this.albums) {
+            value.isActive = false;
+          }
+          console.log(this.albums);
+        })
+        .catch(error => {
+          console.log(error)
+          this.errored = true
+        })
+        .finally(() => this.loading = false)
+    },
+  })
+</script>

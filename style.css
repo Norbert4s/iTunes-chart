@@ -1,0 +1,179 @@
+body {
+  background-color: #F0F0F0;
+}
+
+ul {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 0;
+}
+
+.album {
+  margin-top: 0.7em;
+  margin-bottom: 0.7em;
+  border-radius: 5px;
+  list-style-type: none;
+  border: 1px solid #D3D3D3;
+  background-color: white;
+  transition: 0.3s ease;
+}
+@media screen and (min-width: 1024px) {
+  .album {
+    width: 65vw;
+  }
+}
+@media screen and (max-width: 1023px) {
+  .album {
+    width: 95vw;
+  }
+}
+.album:hover {
+  transform: scale(1.02);
+  border: 1px solid black;
+  cursor: pointer;
+}
+
+.albumImage {
+  height: 8em;
+  width: 8em;
+}
+
+.fullName {
+  display: flex;
+  flex-direction: column;
+  margin-left: 1.5em;
+}
+
+.basic {
+  padding-top: 0.8em;
+  padding-bottom: 0.8em;
+  display: flex;
+  align-items: center;
+  z-index: 1;
+}
+
+.openArrow {
+  width: 2em;
+  height: auto;
+  float: right !important;
+  margin-left: auto;
+  margin-right: 3em;
+  transition: transform 0.5s ease;
+  transform: rotate(0);
+}
+
+.flipArrow {
+  transform: rotate(180deg);
+}
+
+.detailed {
+  transition: 0.5s ease;
+  height: 0;
+  width: 100%;
+  background-color: #F0F0F0;
+  overflow: hidden;
+  text-align: center;
+  display: flex;
+  align-items: center;
+}
+
+.active {
+  background-color: #F0F0F0;
+  height: 9em;
+}
+
+.link {
+  width: 2em;
+  height: auto;
+  margin: 0 auto;
+  transition: 0.3s ease;
+}
+.link:hover {
+  transform: scale(1.2);
+}
+
+.price {
+  border-right: 1px solid #C9C9C9;
+}
+
+.date {
+  border-left: 1px solid #C9C9C9;
+}
+
+@media screen and (min-width: 1024px) {
+  body {
+    font-size: 16px;
+  }
+}
+@media screen and (min-width: 570px) and (max-width: 1023px) {
+  body {
+    font-size: 14px;
+  }
+}
+@media screen and (max-width: 569px) {
+  body {
+    font-size: 10px;
+  }
+}
+.place {
+  font-size: 3em;
+  font-weight: bold;
+  width: 2em;
+  text-align: center;
+}
+
+.title {
+  font-weight: bold;
+}
+
+.artist,
+.title {
+  font-size: 1.3em;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  width: 36vw;
+}
+@media screen and (min-width: 570px) and (max-width: 1023px) {
+  .artist,
+.title {
+    width: 45vw;
+  }
+}
+@media screen and (max-width: 569px) {
+  .artist,
+.title {
+    width: 30vw;
+  }
+}
+
+.showName {
+  white-space: normal;
+  text-overflow: inherit;
+}
+
+.detailedSpan {
+  font-size: 1.5em;
+  font-weight: bold;
+  display: flex;
+  flex-direction: column;
+  color: #343434;
+}
+
+.detailedSpanTitle {
+  font-size: 0.8em;
+  color: #616161;
+}
+
+a {
+  color: #343434;
+  transition: 0.3s ease;
+}
+a:hover {
+  color: #343434;
+  text-decoration: none;
+  transform: scale(1.2);
+}
+
+/*# sourceMappingURL=style.css.map */

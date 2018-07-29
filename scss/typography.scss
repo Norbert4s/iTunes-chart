@@ -1,0 +1,70 @@
+@include desktop {
+  body {
+    font-size: 16px;
+  }
+}
+@include tablet {
+  body {
+    font-size: 14px;
+  }
+}
+@include phone {
+  body {
+    font-size: 10px;
+  }
+}
+
+.place {
+  font-size: 3em;
+  font-weight: bold;
+  width: 2em;
+  text-align: center;
+}
+
+.title {
+  font-weight: bold;
+}
+
+.artist,
+.title {
+  font-size: 1.3em;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  width: 36vw;
+  @include tablet {
+    width: 45vw;
+  }
+  @include phone {
+    width: 30vw;
+  }
+}
+
+.showName {
+  white-space: normal;
+  text-overflow: inherit;
+}
+
+.detailedSpan {
+  font-size: 1.5em;
+  font-weight: bold;
+  display: flex;
+  flex-direction: column;
+  color: #343434;
+}
+
+.detailedSpanTitle {
+  font-size: 0.8em;
+  color: #616161;
+}
+
+a {
+  color: #343434;
+  transition: 0.3s ease;
+
+  &:hover {
+    color: #343434;
+    text-decoration: none;
+    transform: scale(1.2);
+  }
+}

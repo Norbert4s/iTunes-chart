@@ -1,0 +1,60 @@
+@import "variables.scss";
+
+// Media query mixins
+
+@mixin desktop {
+  @media screen and (min-width: #{$desktop-width}) {
+    @content;
+  }
+}
+
+@mixin tabletAndPhone{
+  @media screen and (max-width: #{$desktop-width - 1px}) {
+    @content;
+  }
+}
+
+@mixin bigTablet{
+  @media screen and (min-width: #{$tablet-width}) and (max-width: #{$desktop-width - 1px}) {
+    @content;
+  }
+}
+
+@mixin smallTablet{
+  @media screen and (min-width: #{$phone-width}) and (max-width: #{$tablet-width}){
+    @content;
+  }
+}
+
+@mixin tablet {
+  @media screen and (min-width: #{$phone-width}) and (max-width: #{$desktop-width - 1px}) {
+    @content;
+  }
+}
+
+
+@mixin phone {
+  @media screen and (max-width: #{$phone-width - 1px}) {
+    @content;
+  }
+}
+
+@mixin padding-height($length){
+  padding-top: $length;
+  padding-bottom: $length;
+}
+
+@mixin padding-width($length){
+  padding-left: $length;
+  padding-right: $length;
+}
+
+@mixin margin-height($length){
+  margin-top: $length;
+  margin-bottom: $length;
+}
+
+@mixin margin-width($length){
+  margin-left: $length;
+  margin-right: $length;
+}
