@@ -3,6 +3,7 @@
 
 <head>
   <link rel="stylesheet" href="bootstrap/bootstrap.css">
+  <link rel="stylesheet" href="animate/animate.css">
   <link rel="stylesheet" href="style.css">
   <script src="https://cdn.jsdelivr.net/npm/vue@2.5.16/dist/vue.js"></script>
   <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
@@ -13,31 +14,48 @@
 
 <body>
   <div id="app">
+    <div class="displayButtons">
+      <span class="toggleAlbums toggleAlbumsAll" v-on:click="showAll()">Top 100</span>
+      <span class="toggleAlbums toggleAlbumsFavorites" v-on:click="showFavorites()">Favorites <img src="assets/star-solid.jpg" alt=""></span>
+    </div>
     <ul>
-      <li v-for="(album, index) in albums" class="album" v-on:click='add(album)'>
-        <div class="basic">
-          <span class="place">{{ index + 1}}</span>
-          <img class="albumImage" v-bind:src="album['im:image'][2].label" alt="">
-          <div class="fullName">
-            <span v-bind:class="{'showName': album.isActive}" class="title">{{ album['im:name'].label }}</span>
-            <span v-bind:class="{'showName': album.isActive}" class="artist">{{ album['im:artist'].label }}</span>
+      <transition
+      enter-active-class="animated slideInLeft">
+      <span class="noFavorites" v-if="!activeAlbums.length && this.albums.length > 0">No favorites chosen</span>
+    </transition>
+      <transition-group
+      name="custom-classes-transition"
+      enter-active-class="animated slideInLeft"
+      leave-active-class="animated bounceOutRight"
+      >
+      <li v-for="(album, index) in activeAlbums" v-bind:key="index" class="album">
+          <div class="basic">
+            <img class="favStar" v-bind:src="[album.favorite ? 'assets/star-solid.jpg' : 'assets/star-regular.jpg']" v-on:click='setFavorite(album, index)' alt="">
+            <div class="triggerClick" v-on:click="openDetailed(album)">
+              <span class="place">{{ album.place }}</span>
+              <img class="albumImage" v-bind:src="album['im:image'][2].label" alt="">
+              <div class="fullName">
+                <span v-bind:class="{'showName': album.isDetailed}" class="title">{{ album['im:name'].label }}</span>
+                <span v-bind:class="{'showName': album.isDetailed}" class="artist">{{ album['im:artist'].label }}</span>
+              </div>
+              <div class="openArrow" v-bind:class="{'flipArrow': album.isDetailed}">
+                <img src="assets/angle-down-solid.svg" alt="">
+              </div>
+            </div>
           </div>
-          <div class="openArrow" v-bind:class="{'flipArrow': album.isActive}">
-            <img src="assets/angle-down-solid.svg" alt="">
+          <div class="detailed" v-bind:class="{'active': album.isDetailed}">
+            <div class="col-xs-4">
+              <span class="detailedSpan price"><span class="detailedSpanTitle">Price:</span>{{ album['im:price'].label }}</span>
+            </div>
+            <div class="col-xs-4">
+              <span class="detailedSpan link"><img src="assets/external-link-alt-solid.svg" alt=""></span>
+            </div>
+            <div class="col-xs-4">
+              <span class="detailedSpan date"><span class="detailedSpanTitle">Release date:</span>{{ album['im:releaseDate'].attributes.label }}</span>
+            </div>
           </div>
-        </div>
-        <div class="detailed" v-bind:class="{'active': album.isActive}">
-              <div class="col-xs-4">
-                <span class="detailedSpan price"><span class="detailedSpanTitle">Price:</span>{{ album['im:price'].label }}</span>
-              </div>
-              <div class="col-xs-4">
-                <span class="detailedSpan link"><img src="assets/external-link-alt-solid.svg" alt=""></span>
-              </div>
-              <div class="col-xs-4">
-                <span class="detailedSpan date"><span class="detailedSpanTitle">Release date:</span>{{ album['im:releaseDate'].attributes.label }}</span>
-              </div>
-        </div>
       </li>
+    </transitio-group>
     </ul>
   </div>
 </body>
@@ -50,34 +68,58 @@
     data() {
       return {
         info: null,
-        albums: null,
+        activeAlbums: [],
+        albums: [],
+        favorites: [],
         loading: true,
         errored: false,
-        hehe: false
       }
     },
     methods: {
-      add: function(album) {
-        if (album.isActive === true) {
-          Vue.delete(album, 'isActive');
-          Vue.set(album, 'isActive', false);
+      openDetailed: function(album) {
+        if (album.isDetailed === true) {
+          Vue.delete(album, 'isDetailed');
+          Vue.set(album, 'isDetailed', false);
         } else {
-          Vue.delete(album, 'isActive');
-          Vue.set(album, 'isActive', true);
+          Vue.delete(album, 'isDetailed');
+          Vue.set(album, 'isDetailed', true);
         }
-      }
-    },
-    filters: {
+      },
+      setFavorite: function(album, index) {
+        if (album.favorite === false) {
+          Vue.delete(album, 'favorite');
+          Vue.set(album, 'favorite', true);
 
+          this.favorites.push(album);
+          console.log(this.favorites);
+        } else {
+          Vue.delete(album, 'favorite');
+          Vue.set(album, 'favorite', false);
+
+          this.favorites.splice(index, 1);
+          console.log(this.favorites);
+        }
+      },
+      showFavorites: function() {
+        this.activeAlbums = this.favorites;
+      },
+      showAll: function() {
+        this.activeAlbums = this.albums;
+      }
     },
     mounted() {
       axios
         .get('https://itunes.apple.com/us/rss/topalbums/limit=100/json')
         .then(response => {
-          this.info = response.data.feed
-          this.albums = this.info.entry
-          for (var value of this.albums) {
-            value.isActive = false;
+          this.info = response.data.feed;
+          this.albums = this.info.entry;
+          this.activeAlbums = this.albums;
+          let index = 0;
+          for (var album of this.albums) {
+            index++;
+            album.place = index;
+            album.isDetailed = false;
+            album.favorite = false;
           }
           console.log(this.albums);
         })
