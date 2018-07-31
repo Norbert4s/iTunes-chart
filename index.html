@@ -14,8 +14,8 @@
 
 <body>
 
-  <div id="app" v-cloak>
-    <h1 class="title" v-if="info != null"> {{ info.title.label }}</h1>
+  <div id="app" v-cloak v-if="info != null">
+    <h1 class="title"> {{ info.title.label }}</h1>
     <div class="displayButtons">
       <span class="toggleAlbums toggleAlbumsAll" v-on:click="showAll()">Top 100</span>
       <span class="toggleAlbums toggleAlbumsFavorites" v-on:click="showFavorites()">Favorites <img src="assets/star-solid.jpg" alt=""></span>
@@ -23,10 +23,10 @@
 
     <input class="inputSearch" type="text" v-model="search" placeholder="Search albums..." />
 
-    <ul>
+    <ul v-cloak>
       <span class="noFavorites" v-if="!activeAlbums.length && this.albums.length > 0">No favorites chosen</span>
       <transition-group name="custom-classes-transition" enter-active-class="animated slideInLeft" leave-active-class="animated bounceOutRight">
-        <li v-cloak v-for="(album, index) in filteredAlbums" v-bind:key="index" class="album">
+        <li v-for="(album, index) in filteredAlbums" v-bind:key="index" class="album">
 
           <div class="basic">
             <img class="favStar" v-bind:src="[album.favorite ? 'assets/star-solid.jpg' : 'assets/star-regular.jpg']" v-on:click='setFavorite(album, index)' alt="">
