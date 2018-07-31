@@ -1,11 +1,11 @@
 @include desktop {
   body {
-    font-size: 16px;
+    font-size: 14px;
   }
 }
 @include tablet {
   body {
-    font-size: 14px;
+    font-size: 10px;
   }
 }
 @include phone {
@@ -14,24 +14,31 @@
   }
 }
 
+h1{
+  text-align: center;
+  margin-top: 2em;
+  font-size: 3em;
+}
+
 .place {
   font-size: 3em;
-  font-weight: bold;
-  width: 2em;
-  text-align: center;
+font-weight: bold;
+margin-right: 0.7em;
+margin-left: 0.5em;
+text-align: center;
 }
 
-.title {
+.albumTitle {
   font-weight: bold;
 }
 
-.artist,
-.title {
+.albumTitle,
+.artist {
   font-size: 1.3em;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  width: 26vw;
+  width: 30vw;
   @include tablet {
     width: 45vw;
   }
@@ -67,4 +74,17 @@ a {
     text-decoration: none;
     transform: scale(1.2);
   }
+}
+
+.noFavorites{
+  font-size: 1.5em;
+}
+
+.copyright{
+  @include margin-height(3em);
+  display: flex;
+  align-self: center;
+  justify-content: center;
+  text-align: center;
+  font-size: 1.2em;
 }

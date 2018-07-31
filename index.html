@@ -9,33 +9,32 @@
   <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta charset="utf-8">
-  <title></title>
+  <title>iTunes top 100</title>
 </head>
 
 <body>
-  <div id="app">
+  <!-- load html after getting all the data to not trigger transitions and errors that show up for split second if you reload page quickly(because there is no data in that moment) -->
+  <div v-if="this.info != null" id="app">
+    <h1 class="title">{{ info.title.label }}</h1>
     <div class="displayButtons">
       <span class="toggleAlbums toggleAlbumsAll" v-on:click="showAll()">Top 100</span>
       <span class="toggleAlbums toggleAlbumsFavorites" v-on:click="showFavorites()">Favorites <img src="assets/star-solid.jpg" alt=""></span>
     </div>
+
+    <input class="inputSearch" type="text" v-model="search" placeholder="Search albums..." />
+
     <ul>
-      <transition
-      enter-active-class="animated slideInLeft">
       <span class="noFavorites" v-if="!activeAlbums.length && this.albums.length > 0">No favorites chosen</span>
-    </transition>
-      <transition-group
-      name="custom-classes-transition"
-      enter-active-class="animated slideInLeft"
-      leave-active-class="animated bounceOutRight"
-      >
-      <li v-for="(album, index) in activeAlbums" v-bind:key="index" class="album">
+      <transition-group name="custom-classes-transition" enter-active-class="animated slideInLeft" leave-active-class="animated bounceOutRight">
+        <li v-for="(album, index) in filteredAlbums" v-bind:key="index" class="album">
+
           <div class="basic">
             <img class="favStar" v-bind:src="[album.favorite ? 'assets/star-solid.jpg' : 'assets/star-regular.jpg']" v-on:click='setFavorite(album, index)' alt="">
             <div class="triggerClick" v-on:click="openDetailed(album)">
               <span class="place">{{ album.place }}</span>
               <img class="albumImage" v-bind:src="album['im:image'][2].label" alt="">
               <div class="fullName">
-                <span v-bind:class="{'showName': album.isDetailed}" class="title">{{ album['im:name'].label }}</span>
+                <span v-bind:class="{'showName': album.isDetailed}" class="albumTitle">{{ album['im:name'].label }}</span>
                 <span v-bind:class="{'showName': album.isDetailed}" class="artist">{{ album['im:artist'].label }}</span>
               </div>
               <div class="openArrow" v-bind:class="{'flipArrow': album.isDetailed}">
@@ -43,6 +42,7 @@
               </div>
             </div>
           </div>
+
           <div class="detailed" v-bind:class="{'active': album.isDetailed}">
             <div class="col-xs-4">
               <span class="detailedSpan price"><span class="detailedSpanTitle">Price:</span>{{ album['im:price'].label }}</span>
@@ -54,9 +54,11 @@
               <span class="detailedSpan date"><span class="detailedSpanTitle">Release date:</span>{{ album['im:releaseDate'].attributes.label }}</span>
             </div>
           </div>
-      </li>
-    </transitio-group>
+        </li>
+        </transitio-group>
     </ul>
+
+    <span class="copyright">{{ info.rights.label }}</span>
   </div>
 </body>
 
@@ -71,8 +73,18 @@
         activeAlbums: [],
         albums: [],
         favorites: [],
+        search: "",
         loading: true,
         errored: false,
+      }
+    },
+    computed: {
+      //Takes all active albums and matches them up with what is being typed into search bar
+      filteredAlbums: function() {
+        return this.activeAlbums.filter((album) => {
+          let regex = new RegExp(this.search, "gi");
+          return album.title.label.match(regex);
+        })
       }
     },
     methods: {
@@ -91,13 +103,11 @@
           Vue.set(album, 'favorite', true);
 
           this.favorites.push(album);
-          console.log(this.favorites);
         } else {
           Vue.delete(album, 'favorite');
           Vue.set(album, 'favorite', false);
 
           this.favorites.splice(index, 1);
-          console.log(this.favorites);
         }
       },
       showFavorites: function() {
@@ -108,6 +118,7 @@
       }
     },
     mounted() {
+      //Get api and assign data
       axios
         .get('https://itunes.apple.com/us/rss/topalbums/limit=100/json')
         .then(response => {
@@ -115,13 +126,12 @@
           this.albums = this.info.entry;
           this.activeAlbums = this.albums;
           let index = 0;
-          for (var album of this.albums) {
+          for (let album of this.albums) {
             index++;
             album.place = index;
             album.isDetailed = false;
             album.favorite = false;
           }
-          console.log(this.albums);
         })
         .catch(error => {
           console.log(error)

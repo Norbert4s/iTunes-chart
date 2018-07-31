@@ -3,6 +3,20 @@ body {
 }
 
 
+.inputSearch{
+  width: 65vw;
+  @include tabletAndPhone{
+    width: 95vw;
+  }
+  margin: 0 auto;
+  display: flex;
+  border: 1px solid #D3D3D3;
+  font-size: 1.3em;
+  @include padding-height(0.4em);
+  @include padding-width(0.5em);
+  border-radius: 5px;
+  margin-bottom: 2em;
+}
 
 .displayButtons {
   display: flex;
@@ -150,8 +164,4 @@ ul {
 
 .date {
   border-left: 1px solid #C9C9C9;
-}
-
-.noFavorites{
-  font-size: 1.5em;
 }
