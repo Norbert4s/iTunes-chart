@@ -81,12 +81,3 @@ a {
 .noFavorites {
   font-size: 1.5em;
 }
-
-.copyright {
-  @include margin-height(3em);
-  display: flex;
-  align-self: center;
-  justify-content: center;
-  text-align: center;
-  font-size: 1.2em;
-}

@@ -2,7 +2,13 @@ body {
   background-color: #F0F0F0;
 }
 
-[v-cloak] { display:none; }
+[v-cloak] {
+  display: none;
+}
+
+#id {
+  position: relative;
+}
 
 .inputSearch {
   width: 65vw;
@@ -38,7 +44,7 @@ body {
   transition: 0.3s ease;
 
   &:hover {
-    @include desktop{
+    @include desktop {
       transform: scale(1.1);
     };
     border: 1px solid black;
@@ -59,6 +65,7 @@ ul {
   flex-direction: column;
   align-items: center;
   padding: 0;
+  margin-bottom: 7em;
 }
 
 .album {

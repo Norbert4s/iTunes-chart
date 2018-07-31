@@ -6,6 +6,10 @@ body {
   display: none;
 }
 
+#id {
+  position: relative;
+}
+
 .inputSearch {
   width: 65vw;
   margin: 0 auto;
@@ -68,6 +72,7 @@ ul {
   flex-direction: column;
   align-items: center;
   padding: 0;
+  margin-bottom: 7em;
 }
 
 .album {
@@ -265,16 +270,6 @@ a:hover {
 
 .noFavorites {
   font-size: 1.5em;
-}
-
-.copyright {
-  margin-top: 3em;
-  margin-bottom: 3em;
-  display: flex;
-  align-self: center;
-  justify-content: center;
-  text-align: center;
-  font-size: 1.2em;
 }
 
 /*# sourceMappingURL=style.css.map */
