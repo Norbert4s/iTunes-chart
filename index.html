@@ -14,8 +14,8 @@
 
 <body>
 
-  <div id="app" v-cloak v-if="info != null">
-    <h1 class="title"> {{ info.title.label }}</h1>
+  <div id="app" v-cloak v-if="!loading">
+    <h1 class="title"> {{ label }}</h1>
     <div class="displayButtons">
       <span class="toggleAlbums toggleAlbumsAll" v-on:click="showAll()">Top 100</span>
       <span class="toggleAlbums toggleAlbumsFavorites" v-on:click="showFavorites()">Favorites <img src="assets/star-solid.jpg" alt=""></span>
@@ -24,18 +24,18 @@
     <input class="inputSearch" type="text" v-model="search" placeholder="Search albums..." />
 
     <ul v-cloak>
-      <span class="noFavorites" v-if="!activeAlbums.length && this.albums.length > 0">No favorites chosen</span>
+      <span class="noFavorites" v-if="isFavoriteMode && !filteredAlbums.length">No favorites chosen</span>
       <transition-group name="custom-classes-transition" enter-active-class="animated slideInLeft" leave-active-class="animated bounceOutRight">
-        <li v-for="(album, index) in filteredAlbums" v-bind:key="index" class="album">
+        <li v-for="(album, index) in filteredAlbums" v-bind:key="album.place" class="album">
 
           <div class="basic">
-            <img class="favStar" v-bind:src="[album.favorite ? 'assets/star-solid.jpg' : 'assets/star-regular.jpg']" v-on:click='setFavorite(album, index)' alt="">
+            <img class="favStar" v-bind:src="[album.favorite ? 'assets/star-solid.jpg' : 'assets/star-regular.jpg']" v-on:click='setFavorite(album)' alt="">
             <div class="triggerClick" v-on:click="openDetailed(album)">
               <span class="place">{{ album.place }}</span>
-              <img class="albumImage" v-bind:src="album['im:image'][2].label" alt="">
+              <img class="albumImage" v-bind:src="album.image" alt="">
               <div class="fullName">
-                <span v-bind:class="{'showName': album.isDetailed}" class="albumTitle">{{ album['im:name'].label }}</span>
-                <span v-bind:class="{'showName': album.isDetailed}" class="artist">{{ album['im:artist'].label }}</span>
+                <span v-bind:class="{'showName': album.isDetailed}" class="albumTitle">{{ album.name }}</span>
+                <span v-bind:class="{'showName': album.isDetailed}" class="artist">{{ album.artist }}</span>
               </div>
               <div class="openArrow" v-bind:class="{'flipArrow': album.isDetailed}">
                 <img src="assets/angle-down-solid.svg" alt="">
@@ -45,13 +45,13 @@
 
           <div class="detailed" v-bind:class="{'active': album.isDetailed}">
             <div class="col-xs-4">
-              <span class="detailedSpan price"><span class="detailedSpanTitle">Price:</span>{{ album['im:price'].label }}</span>
+              <span class="detailedSpan price"><span class="detailedSpanTitle">Price:</span>{{ album.price }}</span>
             </div>
             <div class="col-xs-4">
-              <span class="detailedSpan link"><img src="assets/external-link-alt-solid.svg" alt=""></span>
+              <a v-bind:href="album.link"><span class="detailedSpan link"><img src="assets/external-link-alt-solid.svg" alt=""></span></a>
             </div>
             <div class="col-xs-4">
-              <span class="detailedSpan date"><span class="detailedSpanTitle">Release date:</span>{{ album['im:releaseDate'].attributes.label }}</span>
+              <span class="detailedSpan date"><span class="detailedSpanTitle">Release date:</span>{{ album.date }}</span>
             </div>
           </div>
         </li>
@@ -67,73 +67,79 @@
     el: '#app',
     data() {
       return {
-        info: null,
-        activeAlbums: [],
+        label: null,
         albums: [],
-        favorites: [],
         search: "",
         loading: true,
-        errored: false,
+        isFavoriteMode: false,
       }
     },
     computed: {
       //Takes all active albums and matches them up with what is being typed into search bar
       filteredAlbums: function() {
-        return this.activeAlbums.filter((album) => {
-          let regex = new RegExp(this.search, "gi");
-          return album.title.label.match(regex);
-        })
+        return this.albums.filter((album) => {
+          const favoriteCond = this.isFavoriteMode ? album.favorite : true;
+          const searchCond = album.label.toLowerCase().includes(this.search.toLowerCase());
+          return searchCond && favoriteCond;
+        });
       }
     },
     methods: {
       openDetailed: function(album) {
-        if (album.isDetailed === true) {
-          Vue.delete(album, 'isDetailed');
-          Vue.set(album, 'isDetailed', false);
+        if (album.isDetailed) {
+          album.isDetailed = false;
         } else {
-          Vue.delete(album, 'isDetailed');
-          Vue.set(album, 'isDetailed', true);
+          album.isDetailed = true;
         }
       },
-      setFavorite: function(album, index) {
-        if (album.favorite === false) {
-          Vue.delete(album, 'favorite');
-          Vue.set(album, 'favorite', true);
-
-          this.favorites.push(album);
+      setFavorite: function(album) {
+        if (album.favorite) {
+          album.favorite = false;
         } else {
-          Vue.delete(album, 'favorite');
-          Vue.set(album, 'favorite', false);
-
-          this.favorites.splice(index, 1);
+          album.favorite = true;
         }
       },
       showFavorites: function() {
-        this.activeAlbums = this.favorites;
+        this.isFavoriteMode = true;
       },
       showAll: function() {
-        this.activeAlbums = this.albums;
-      }
+        this.isFavoriteMode = false;
+      },
+      getLabel: (property, album) => album[`im:${property}`].label,
+      getBigImage: album => album['im:image'][2].label,
     },
     mounted() {
       //Get api and assign data
       axios
         .get('https://itunes.apple.com/us/rss/topalbums/limit=100/json')
         .then(response => {
-          this.info = response.data.feed;
-          this.albums = this.info.entry;
-          this.activeAlbums = this.albums;
-          let index = 0;
-          for (let album of this.albums) {
-            index++;
-            album.place = index;
-            album.isDetailed = false;
-            album.favorite = false;
-          }
+          this.label = response.data.feed.title.label;
+          const albums = response.data.feed.entry;
+
+          this.albums = albums.reduce(
+            (acc, album, index) => {
+              const record = {
+                label: album.title.label,
+                name: this.getLabel('name', album),
+                artist: this.getLabel('artist', album),
+                price: this.getLabel('price', album),
+                date: album['im:releaseDate'].attributes.label,
+                link: album.link.attributes.href,
+                image: this.getBigImage(album),
+
+                favorite: false,
+                isDetailed: false,
+                place: index + 1,
+              };
+
+              acc.push(record);
+              return acc;
+            },
+            [],
+          );
         })
         .catch(error => {
-          console.log(error)
-          this.errored = true
+          console.log(error);
         })
         .finally(() => this.loading = false)
     },
